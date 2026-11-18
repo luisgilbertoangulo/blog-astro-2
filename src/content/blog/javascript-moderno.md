@@ -3,7 +3,7 @@ title: "JavaScript moderno en la práctica"
 description: "let y const, funciones flecha, destructuración y async/await con ejemplos sencillos."
 pubDate: "2026-10-05"
 heroImage: "../../assets/blog-placeholder-4.jpg"
-alt: "Pantalla de código en un editor de texto"
+alt: "Paisaje verde con colinas, árboles y nubes"
 ---
 
 JavaScript ha cambiado mucho desde los tiempos de `var` y callbacks anidados. Hoy contamos con una sintaxis más clara que conviene conocer aunque no uses frameworks.

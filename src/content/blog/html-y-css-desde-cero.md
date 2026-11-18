@@ -3,7 +3,7 @@ title: "HTML y CSS desde cero"
 description: "Las bases de la web: HTML semántico, modelo de caja y los primeros pasos con CSS."
 pubDate: "2026-10-20"
 heroImage: "../../assets/blog-placeholder-3.jpg"
-alt: "Ilustración abstracta con formas geométricas sobre desarrollo web"
+alt: "Paisaje de costa con el mar, el sol y una zona verde"
 ---
 
 Toda página web, por compleja que sea, se acaba convirtiendo en HTML y CSS. El HTML aporta la estructura y el significado; el CSS se encarga del aspecto. Tener claras estas dos capas es el mejor punto de partida.

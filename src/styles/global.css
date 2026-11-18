@@ -128,7 +128,7 @@ td {
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 16px;
+	border-radius: 0;
 }
 
 code {

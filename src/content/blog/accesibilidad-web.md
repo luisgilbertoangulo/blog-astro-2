@@ -3,7 +3,7 @@ title: "Accesibilidad web sin complicaciones"
 description: "Buenas prácticas sencillas para que tus páginas sean utilizables por todo el mundo."
 pubDate: "2026-08-30"
 heroImage: "../../assets/blog-placeholder-1.jpg"
-alt: "Ilustración abstracta de interfaces y elementos de diseño"
+alt: "Paisaje de montañas azules con el sol y colinas verdes"
 ---
 
 La accesibilidad no es una funcionalidad opcional que se añade al final. Son decisiones pequeñas tomadas desde el principio que mejoran la experiencia de todas las personas.
