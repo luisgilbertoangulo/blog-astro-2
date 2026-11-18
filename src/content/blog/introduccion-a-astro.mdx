@@ -1,0 +1,54 @@
+---
+title: "Introducción a Astro"
+description: "Por qué elegir Astro para un blog estático y cómo funcionan sus islas y colecciones de contenido."
+pubDate: "2026-08-12"
+heroImage: "../../assets/blog-placeholder-5.jpg"
+alt: "Ilustración de una interfaz de código con tonos azules"
+---
+
+import { BASE_URL } from '../../consts';
+import HeaderLink from '../../components/HeaderLink.astro';
+
+Astro es un generador de sitios estáticos que envía al navegador **solo el HTML y el CSS necesarios**. Por defecto no manda JavaScript, y eso se nota en la velocidad de carga.
+
+## Componentes con extensión `.astro`
+
+Un componente de Astro mezcla un bloque de código entre `---` con una plantilla HTML:
+
+```astro
+---
+const saludos = ['Hola', 'Buenos días', 'Qué tal'];
+---
+
+<p>{saludos[0]}, soy Luis.</p>
+```
+
+El código de la parte superior se ejecuta en el servidor durante la compilación. No llega al navegador.
+
+## Islas de interactividad
+
+Si necesitas JavaScript, puedes usar componentes de React, Vue, Svelte u otros frameworks y decidir cuándo se hidratan:
+
+```astro
+<Contador client:load />
+```
+
+Con `client:load` el componente se carga al abrir la página; con `client:visible`, solo cuando entra en pantalla. El resto del sitio sigue siendo HTML estático.
+
+## Colecciones de contenido
+
+Los artículos de este blog viven en `src/content/blog/`. Astro los valida con un esquema y ofrece tipos TypeScript automáticos:
+
+```ts
+import { getCollection } from 'astro:content';
+
+const articulos = await getCollection('blog');
+```
+
+Así, un error en el frontmatter de un artículo se detecta al compilar, no al publicar.
+
+## Despliegue
+
+Este sitio se compila en GitHub Pages. La configuración de `site` y `base` en `astro.config.mjs` es la que permite que los enlaces funcionen bajo la ruta `/blog-astro-2/`.
+
+<HeaderLink href={`${BASE_URL}blog/`}>Volver a todos los artículos</HeaderLink>

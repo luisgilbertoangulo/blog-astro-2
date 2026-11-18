@@ -1,63 +1,48 @@
-# Astro Starter Kit: Blog
+# El blog de Luis
 
-```sh
-npm create astro@latest -- --template blog
-```
+Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](https://astro.build/) y publicado en GitHub Pages.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Qué contiene
 
-Features:
+- Artículos en Markdown y MDX, con esquema validado en `src/content.config.ts`.
+- Feed RSS, sitemap, metadatos Open Graph y fuentes locales.
+- Despliegue automático en GitHub Pages mediante GitHub Actions.
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Estructura del proyecto
 
 ```text
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+src/
+├── assets/       # imágenes y fuentes que optimiza Astro
+├── components/   # BaseHead, Header, HeaderLink, Footer, FormattedDate
+├── content/blog/ # artículos del blog (.md y .mdx)
+├── layouts/      # BlogPost y PageLayout
+├── pages/        # rutas del sitio
+└── styles/       # estilos globales
+public/           # favicon y otros archivos estáticos
+.github/workflows # flujo de despliegue
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Astro crea una ruta por cada archivo de `src/pages/`. Los artículos se leen desde `src/content/blog/` y se renderizan en `src/pages/blog/[...slug].astro`.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Comandos
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+| Comando              | Acción                                                  |
+| -------------------- | ------------------------------------------------------- |
+| `npm install`        | Instala las dependencias.                               |
+| `npm run dev`        | Inicia el servidor de desarrollo en `localhost:4321`.   |
+| `npm run build`      | Genera el sitio en `./dist/`.                           |
+| `npm run preview`    | Previsualiza la compilación localmente.                 |
+| `npx astro check`    | Revisa tipos y errores en los componentes.              |
 
-Any static assets, like images, can be placed in the `public/` directory.
+El proyecto sigue las instrucciones de `AGENTS.md`: el servidor de desarrollo se inicia con `astro dev --background` y se gestiona con `astro dev stop`, `astro dev status` y `astro dev logs`.
 
-## 🧞 Commands
+## Despliegue en GitHub Pages
 
-All commands are run from the root of the project, from a terminal:
+El sitio se publica en <https://luisgilbertoangulo.github.io/blog-astro-2/>.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- En `astro.config.mjs`, `site` es `https://luisgilbertoangulo.github.io` y `base` es `/blog-astro-2`.
+- Los enlaces internos usan `import.meta.env.BASE_URL` para funcionar tanto en desarrollo como bajo esa ruta.
+- `.github/workflows/deploy.yml` compila y despliega en cada `push` a `master`.
+- En GitHub hay que tener **Settings → Pages → Source: GitHub Actions**.
 
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+Para publicar un cambio basta con hacer commit y push a `master`.
