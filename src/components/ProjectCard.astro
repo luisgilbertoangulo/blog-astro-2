@@ -1,0 +1,161 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { projectPath } from '../utils/portfolio';
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+
+interface Props {
+	project: CollectionEntry<'portfolio'>;
+}
+
+const { project } = Astro.props;
+const {
+	title,
+	description,
+	writtenDate,
+	completedDate,
+	url,
+	repo,
+	role,
+	image,
+	imageAlt,
+	imageWidth,
+	imageHeight,
+	tags,
+} = project.data;
+const href = projectPath(project);
+---
+
+<li class="project-card">
+	<article class="card-inner">
+		{image && (
+			<div class="card-image">
+				<img
+					src={image}
+					alt={imageAlt}
+					width={imageWidth}
+					height={imageHeight}
+					loading="lazy"
+					decoding="async"
+				/>
+			</div>
+		)}
+		<div class="card-body">
+			<p class="meta">
+				Realizado: <FormattedDate date={completedDate} />
+				<span aria-hidden="true"> · </span>
+				Ficha: <FormattedDate date={writtenDate} />
+			</p>
+			<h2 class="title"><a href={href}>{title}</a></h2>
+			{role && <p class="role">{role}</p>}
+			<p class="excerpt">{description}</p>
+			{(url || repo) && (
+				<p class="links">
+					{url && (
+						<a href={url} target="_blank" rel="noopener noreferrer">
+							Ver proyecto ↗
+						</a>
+					)}
+					{repo && (
+						<a href={repo} target="_blank" rel="noopener noreferrer">
+							Código ↗
+						</a>
+					)}
+				</p>
+			)}
+			<div class="tags-wrap"><Tags {tags} /></div>
+		</div>
+	</article>
+</li>
+
+<style>
+	.project-card {
+		display: flex;
+		min-width: 0;
+	}
+	.card-inner {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		overflow: hidden;
+		background: rgba(15, 23, 42, 0.6);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease,
+			border-color 0.2s ease;
+	}
+	.project-card:hover .card-inner {
+		transform: translateY(-3px);
+		box-shadow: var(--box-shadow);
+		border-color: rgba(96, 165, 250, 0.5);
+	}
+	.card-image {
+		overflow: hidden;
+		background: #020617;
+	}
+	.card-image img {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2 / 1;
+		height: auto;
+		object-fit: cover;
+		border-radius: 0;
+	}
+	.card-body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1.25rem;
+	}
+	.meta {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+	}
+	.title {
+		margin: 0;
+		font-size: 1.35rem;
+		line-height: 1.25;
+	}
+	.title a {
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+	.title a:hover {
+		color: var(--accent);
+	}
+	.role {
+		margin: 0;
+		color: var(--accent-dark);
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+	.excerpt {
+		display: -webkit-box;
+		overflow: hidden;
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95em;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+	}
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin: 0;
+		font-size: 0.9rem;
+	}
+	.tags-wrap {
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.project-card:hover .card-inner {
+			transform: none;
+		}
+	}
+</style>

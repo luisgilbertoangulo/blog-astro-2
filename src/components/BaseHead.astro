@@ -9,19 +9,24 @@ import { Font } from 'astro:assets';
 import {
 	blogPostingNode,
 	breadcrumbNode,
+	courseNode,
+	creativeWorkNode,
 	personNode,
 	profilePageNode,
+	resumeNode,
 	serializeJsonLd,
 	webPageNode,
 	websiteNode,
 	type BreadcrumbItem,
 	type JsonLdNode,
+	type ProjectJsonLdParams,
+	type ResumeJsonLdParams,
 } from '../utils/jsonld';
 
 interface Props {
 	title: string;
 	description: string;
-	image?: ImageMetadata;
+	image?: ImageMetadata | string;
 	imageAlt?: string;
 	noindex?: boolean;
 	type?: 'website' | 'article';
@@ -31,6 +36,8 @@ interface Props {
 	minutes?: number;
 	breadcrumbs?: BreadcrumbItem[];
 	profile?: boolean;
+	project?: ProjectJsonLdParams;
+	resume?: ResumeJsonLdParams;
 }
 
 const {
@@ -46,13 +53,16 @@ const {
 	minutes,
 	breadcrumbs,
 	profile = false,
+	project,
+	resume,
 } = Astro.props;
 
 // Astro.site está configurado en astro.config.mjs; el fallback evita fallar en otros entornos.
 const site = Astro.site ?? new URL(Astro.url.origin);
 const canonicalURL = new URL(Astro.url.pathname, site);
 const siteURL = new URL(BASE_URL, site);
-const ogImageURL = new URL(image.src, Astro.url);
+const imageSrc = typeof image === 'string' ? image : image.src;
+const ogImageURL = new URL(imageSrc, Astro.url);
 
 // Un único grafo conecta Person, WebSite y, según la página, el resto de entidades.
 const graph: JsonLdNode[] = [personNode(siteURL), websiteNode(siteURL)];
@@ -77,10 +87,31 @@ if (type === 'article') {
 			{ name: title },
 		]),
 	);
-} else if (profile) {
-	graph.push(profilePageNode(siteURL, canonicalURL, title));
-} else if (breadcrumbs?.length) {
-	graph.push(breadcrumbNode(canonicalURL, breadcrumbs));
+} else {
+	if (project) {
+		graph.push(
+			webPageNode({
+				site: siteURL,
+				canonicalURL,
+				title,
+				description,
+				imageURL: project.image ? ogImageURL : undefined,
+			}),
+			creativeWorkNode(siteURL, canonicalURL, project),
+		);
+	}
+	if (resume) {
+		graph.push(
+			webPageNode({ site: siteURL, canonicalURL, title, description }),
+			resumeNode(siteURL, canonicalURL, resume),
+			courseNode(siteURL),
+		);
+	}
+	if (profile) {
+		graph.push(profilePageNode(siteURL, canonicalURL, title));
+	} else if (breadcrumbs?.length) {
+		graph.push(breadcrumbNode(canonicalURL, breadcrumbs));
+	}
 }
 
 const jsonLd = serializeJsonLd(graph);

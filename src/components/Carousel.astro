@@ -1,0 +1,395 @@
+---
+import CarouselCard from './CarouselCard.astro';
+import { buildCarouselSteps, type CarouselItem } from '../utils/carousel';
+
+interface Props {
+	projects: CarouselItem[];
+	posts: CarouselItem[];
+}
+
+const { projects, posts } = Astro.props;
+
+const panels = [
+	{
+		id: 'proyectos',
+		label: 'Proyectos',
+		steps: buildCarouselSteps(projects),
+		empty: 'Todavía no hay proyectos publicados.',
+	},
+	{
+		id: 'articulos',
+		label: 'Artículos',
+		steps: buildCarouselSteps(posts),
+		empty: 'Todavía no hay artículos publicados.',
+	},
+];
+---
+
+<section class="carousel" data-carousel aria-labelledby="carousel-title">
+	<div class="carousel-head">
+		<h2 id="carousel-title">Proyectos y artículos por fecha</h2>
+		<div class="tabs" role="tablist" aria-label="Tipo de contenido">
+			{panels.map((panel) => (
+				<button
+					class="tab"
+					type="button"
+					role="tab"
+					id={`tab-${panel.id}`}
+					aria-controls={`panel-${panel.id}`}
+					aria-selected={panel.id === panels[0].id ? 'true' : 'false'}
+					tabindex={panel.id === panels[0].id ? 0 : -1}
+					data-tab={panel.id}
+				>
+					{panel.label}
+				</button>
+			))}
+		</div>
+	</div>
+
+	{panels.map((panel) => (
+		<div
+			class="panel"
+			id={`panel-${panel.id}`}
+			role="tabpanel"
+			aria-labelledby={`tab-${panel.id}`}
+			data-panel={panel.id}
+		>
+			<h3 class="panel-title">{panel.label}</h3>
+			{panel.steps.length === 0 ? (
+				<p class="empty">{panel.empty}</p>
+			) : (
+				<>
+					<div
+						class="viewport"
+						role="region"
+						aria-roledescription="carrusel"
+						aria-label={`${panel.label} por fecha`}
+					>
+						<div class="track" style="--index: 0;">
+							{panel.steps.map((step, index) => (
+								<div
+									class="step"
+									role="group"
+									aria-roledescription="diapositiva"
+									aria-label={`${index + 1} de ${panel.steps.length}`}
+								>
+									{step.divider && <p class="date-marker">{step.divider}</p>}
+									<CarouselCard item={step.item} />
+								</div>
+							))}
+						</div>
+					</div>
+					<div class="controls">
+						<button class="nav" type="button" aria-label="Diapositiva anterior">←</button>
+						<div class="dots">
+							{panel.steps.map((_, index) => (
+								<button
+									class="dot"
+									type="button"
+									aria-label={`Ir a la diapositiva ${index + 1}`}
+									aria-current={index === 0 ? 'true' : undefined}
+								></button>
+							))}
+						</div>
+						<button class="nav" type="button" aria-label="Diapositiva siguiente">→</button>
+					</div>
+					<div class="progress" aria-hidden="true">
+						{panel.steps.map((_, index) => (
+							<span class:list={['progress-segment', { 'is-done': index === 0 }]}></span>
+						))}
+					</div>
+					<p class="sr-only" data-live aria-live="polite"></p>
+				</>
+			)}
+		</div>
+	))}
+</section>
+
+<script>
+	// Mejora progresiva: sin JS se ven los dos bloques en orden.
+	document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+		root.classList.add('is-enhanced');
+		const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+		const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+
+		const showTab = (name: string, focus = false) => {
+			tabs.forEach((tab) => {
+				const active = tab.dataset.tab === name;
+				tab.setAttribute('aria-selected', String(active));
+				tab.tabIndex = active ? 0 : -1;
+				if (active && focus) tab.focus();
+			});
+			panels.forEach((panel) => {
+				panel.hidden = panel.dataset.panel !== name;
+			});
+		};
+
+		tabs.forEach((tab, index) => {
+			tab.addEventListener('click', () => showTab(tab.dataset.tab ?? ''));
+			tab.addEventListener('keydown', (event) => {
+				if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+				event.preventDefault();
+				const offset = event.key === 'ArrowRight' ? 1 : tabs.length - 1;
+				const next = tabs[(index + offset) % tabs.length];
+				showTab(next.dataset.tab ?? '', true);
+			});
+		});
+		showTab(tabs[0]?.dataset.tab ?? '');
+
+		panels.forEach((panel) => {
+			const track = panel.querySelector<HTMLElement>('.track');
+			if (!track) return;
+			const steps = Array.from(track.querySelectorAll<HTMLElement>('.step'));
+			const dots = Array.from(panel.querySelectorAll<HTMLButtonElement>('.dot'));
+			const segments = Array.from(panel.querySelectorAll<HTMLElement>('.progress-segment'));
+			const live = panel.querySelector<HTMLElement>('[data-live]');
+			let index = 0;
+
+			const render = () => {
+				track.style.setProperty('--index', String(index));
+				steps.forEach((step, i) => {
+					step.classList.toggle('is-active', i === index);
+					step.classList.toggle('is-prev', i === index - 1);
+					step.classList.toggle('is-next', i === index + 1);
+					step.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+					step.inert = i !== index;
+					step.querySelector<HTMLElement>('.date-marker')?.style.setProperty(
+						'--parallax',
+						`${(index - i) * 12}%`,
+					);
+				});
+				dots.forEach((dot, i) => {
+					dot.classList.toggle('is-active', i === index);
+					if (i === index) dot.setAttribute('aria-current', 'true');
+					else dot.removeAttribute('aria-current');
+				});
+				segments.forEach((segment, i) => segment.classList.toggle('is-done', i <= index));
+				if (live) live.textContent = `Diapositiva ${index + 1} de ${steps.length}`;
+			};
+
+			const go = (next: number) => {
+				index = (next + steps.length) % steps.length;
+				render();
+			};
+
+			panel.querySelector('.prev')?.addEventListener('click', () => go(index - 1));
+			panel.querySelector('.next')?.addEventListener('click', () => go(index + 1));
+			dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+			panel.addEventListener('keydown', (event) => {
+				if (event.key === 'ArrowLeft') {
+					event.preventDefault();
+					go(index - 1);
+				}
+				if (event.key === 'ArrowRight') {
+					event.preventDefault();
+					go(index + 1);
+				}
+			});
+			render();
+		});
+	});
+</script>
+
+<style>
+	.carousel {
+		margin-top: 2.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--border);
+	}
+	.carousel-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.carousel-head h2 {
+		margin: 0;
+		font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+	}
+	.tabs {
+		display: none;
+		gap: 0.25rem;
+		padding: 0.25rem;
+		background: rgba(2, 6, 23, 0.5);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+	}
+	.is-enhanced .tabs {
+		display: flex;
+	}
+	.tab {
+		padding: 0.45em 1.1em;
+		border: 0;
+		border-radius: 999px;
+		background: transparent;
+		color: rgb(var(--gray));
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+		transition:
+			background-color 0.2s ease,
+			color 0.2s ease;
+	}
+	.tab[aria-selected='true'] {
+		background: var(--accent);
+		color: #0b1220;
+	}
+	.tab:focus-visible,
+	.nav:focus-visible,
+	.dot:focus-visible {
+		outline: 3px solid var(--accent-dark);
+		outline-offset: 2px;
+	}
+	.panel {
+		margin-top: 1rem;
+	}
+	.panel-title {
+		margin: 0 0 0.5rem;
+		font-size: 1.1rem;
+	}
+	.is-enhanced .panel-title {
+		display: none;
+	}
+	.empty {
+		padding: 1.5rem;
+		border: 1px dashed var(--border);
+		border-radius: 14px;
+		color: rgb(var(--gray));
+	}
+	.viewport {
+		overflow: visible;
+	}
+	.track {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.step {
+		min-width: 0;
+	}
+	.date-marker {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-size: 0.85rem;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	.controls,
+	.progress {
+		display: none;
+	}
+	.is-enhanced .controls {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		margin-top: 1.25rem;
+	}
+	.nav {
+		display: grid;
+		place-items: center;
+		width: 2.4rem;
+		height: 2.4rem;
+		border: 1px solid var(--border);
+		border-radius: 50%;
+		background: rgba(15, 23, 42, 0.8);
+		color: rgb(var(--black));
+		font-size: 1.1rem;
+		cursor: pointer;
+		transition:
+			background-color 0.2s ease,
+			transform 0.2s ease;
+	}
+	.nav:hover {
+		background: var(--accent);
+		color: #0b1220;
+		transform: scale(1.06);
+	}
+	.dots {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: rgba(148, 163, 184, 0.5);
+		cursor: pointer;
+		transition:
+			background-color 0.3s ease,
+			box-shadow 0.3s ease,
+			transform 0.3s ease;
+	}
+	.dot.is-active {
+		background: var(--accent);
+		box-shadow:
+			0 0 0 4px rgba(96, 165, 250, 0.18),
+			0 0 14px rgba(96, 165, 250, 0.9);
+		transform: scale(1.25);
+	}
+	.is-enhanced .progress {
+		display: flex;
+		gap: 0.3rem;
+		margin-top: 1rem;
+	}
+	.progress-segment {
+		flex: 1;
+		height: 2px;
+		border-radius: 2px;
+		background: rgba(148, 163, 184, 0.2);
+		transition: background-color 0.4s ease;
+	}
+	.progress-segment.is-done {
+		background: var(--accent);
+	}
+
+	/* Animación «órbita de fechas»: profundidad, parallax y estelas de progreso. */
+	.is-enhanced .viewport {
+		overflow: hidden;
+		padding: 1.25rem 0;
+	}
+	.is-enhanced .track {
+		flex-direction: row;
+		transform: translateX(calc(var(--index, 0) * -100%));
+		transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	.is-enhanced .step {
+		flex: 0 0 100%;
+		transform: scale(0.86);
+		opacity: 0.45;
+		filter: blur(1px);
+		transition:
+			transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+			opacity 500ms ease,
+			filter 500ms ease;
+	}
+	.is-enhanced .step.is-active {
+		transform: scale(1);
+		opacity: 1;
+		filter: none;
+	}
+	.is-enhanced .date-marker {
+		transform: translateX(var(--parallax, 0%));
+		transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.is-enhanced .track,
+		.is-enhanced .step,
+		.is-enhanced .date-marker {
+			transition: none;
+		}
+		.is-enhanced .step {
+			transform: none;
+			opacity: 1;
+			filter: none;
+		}
+		.is-enhanced .date-marker {
+			transform: none;
+		}
+	}
+</style>

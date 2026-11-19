@@ -1,0 +1,173 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { BASE_URL } from '../../consts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Tags from '../../components/Tags.astro';
+import type { BreadcrumbItem } from '../../utils/jsonld';
+import { getSortedProjects } from '../../utils/portfolio';
+
+export async function getStaticPaths() {
+	const projects = await getSortedProjects();
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+
+interface Props {
+	project: CollectionEntry<'portfolio'>;
+}
+
+const { project } = Astro.props;
+const {
+	title,
+	description,
+	writtenDate,
+	completedDate,
+	url,
+	repo,
+	role,
+	image,
+	imageAlt,
+	imageWidth,
+	imageHeight,
+	tags,
+} = project.data;
+const { Content } = await render(project);
+
+const breadcrumbs: BreadcrumbItem[] = [
+	{ name: 'Inicio', url: BASE_URL },
+	{ name: 'Portafolio', url: `${BASE_URL}portfolio/` },
+	{ name: title },
+];
+---
+
+<BaseLayout
+	{title}
+	{description}
+	image={image}
+	imageAlt={imageAlt}
+	{breadcrumbs}
+	project={{
+		title,
+		description,
+		writtenDate,
+		completedDate,
+		url,
+		repo,
+		image,
+		tags,
+	}}
+>
+	<article class="prose">
+		<header class="project-header">
+			<p class="eyebrow">Proyecto</p>
+			<h1>{title}</h1>
+			<p class="lead">{description}</p>
+			<div class="dates">
+				<p>Realizado: <FormattedDate date={completedDate} /></p>
+				<p>Ficha escrita: <FormattedDate date={writtenDate} /></p>
+			</div>
+			{role && <p class="role"><strong>Rol:</strong> {role}</p>}
+			<Tags {tags} />
+			{(url || repo) && (
+				<p class="actions">
+					{url && (
+						<a class="button" href={url} target="_blank" rel="noopener noreferrer">
+							Ver proyecto ↗
+						</a>
+					)}
+					{repo && (
+						<a class="button secondary" href={repo} target="_blank" rel="noopener noreferrer">
+							Ver código ↗
+						</a>
+					)}
+				</p>
+			)}
+		</header>
+
+		{image && (
+			<img
+				class="project-image"
+				src={image}
+				alt={imageAlt}
+				width={imageWidth}
+				height={imageHeight}
+				loading="lazy"
+				decoding="async"
+			/>
+		)}
+
+		<Content />
+
+		<p class="back"><a href={`${BASE_URL}portfolio/`}>← Volver al portafolio</a></p>
+	</article>
+</BaseLayout>
+
+<style>
+	.project-header {
+		margin-bottom: 1.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.35rem;
+		color: var(--accent);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+	.lead {
+		font-size: 1.1rem;
+	}
+	.dates {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		margin: 0 0 0.5rem;
+		color: rgb(var(--gray));
+		font-size: 0.9rem;
+	}
+	.dates p {
+		margin: 0;
+	}
+	.role {
+		margin: 0.5rem 0;
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin: 1rem 0;
+	}
+	.button {
+		display: inline-block;
+		padding: 0.5em 1.1em;
+		border-radius: 999px;
+		background: var(--accent);
+		color: #0b1220;
+		font-weight: 700;
+		text-decoration: none;
+	}
+	.button.secondary {
+		background: transparent;
+		border: 1px solid var(--accent);
+		color: var(--accent-dark);
+	}
+	.button:hover {
+		filter: brightness(1.1);
+	}
+	.project-image {
+		display: block;
+		width: 100%;
+		height: auto;
+		max-width: 1020px;
+		margin: 0 0 1.5rem;
+		border-radius: 14px;
+		aspect-ratio: 2 / 1;
+		object-fit: cover;
+	}
+	.back {
+		margin-top: 2rem;
+	}
+</style>

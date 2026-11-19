@@ -1,7 +1,7 @@
 // Datos estructurados (schema.org) del sitio.
 // Cada función construye un nodo y BaseHead los combina en un único grafo @graph.
 
-import { AUTHOR, AUTHOR_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { AUTHOR, AUTHOR_URL, CV_COURSE_NAME, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 export interface JsonLdNode {
 	'@type': string;
@@ -17,6 +17,7 @@ export interface BreadcrumbItem {
 
 const siteId = (site: URL) => new URL('#website', site).href;
 const personId = (site: URL) => new URL('#person', site).href;
+const courseId = (site: URL) => new URL('#course-mf0493-3', site).href;
 
 export function personNode(site: URL): JsonLdNode {
 	return {
@@ -45,7 +46,7 @@ interface WebPageParams {
 	canonicalURL: URL;
 	title: string;
 	description: string;
-	imageURL: URL;
+	imageURL?: URL | string;
 }
 
 export function webPageNode({
@@ -62,7 +63,7 @@ export function webPageNode({
 		name: title,
 		description,
 		isPartOf: { '@id': siteId(site) },
-		primaryImageOfPage: imageURL.href,
+		...(imageURL ? { primaryImageOfPage: typeof imageURL === 'string' ? imageURL : imageURL.href } : {}),
 		inLanguage: 'es',
 	};
 }
@@ -107,6 +108,53 @@ export function blogPostingNode({
 	};
 }
 
+export interface ProjectJsonLdParams {
+	title: string;
+	description: string;
+	writtenDate?: Date;
+	completedDate?: Date;
+	url?: string;
+	repo?: string;
+	image?: string;
+	tags?: string[];
+}
+
+export function creativeWorkNode(
+	site: URL,
+	canonicalURL: URL,
+	project: ProjectJsonLdParams,
+): JsonLdNode {
+	const {
+		title,
+		description,
+		writtenDate,
+		completedDate,
+		url,
+		repo,
+		image,
+		tags = [],
+	} = project;
+	const sameAs = [url, repo].filter((link): link is string => Boolean(link));
+
+	return {
+		'@type': 'CreativeWork',
+		'@id': `${canonicalURL.href}#project`,
+		url: canonicalURL.href,
+		name: title,
+		description,
+		dateCreated: writtenDate?.toISOString(),
+		datePublished: (completedDate ?? writtenDate)?.toISOString(),
+		...(image ? { image } : {}),
+		author: { '@id': personId(site) },
+		creator: { '@id': personId(site) },
+		isPartOf: { '@id': siteId(site) },
+		mainEntityOfPage: { '@id': canonicalURL.href },
+		inLanguage: 'es',
+		...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
+		...(sameAs.length > 0 ? { sameAs } : {}),
+	};
+}
+
 export function profilePageNode(site: URL, canonicalURL: URL, title: string): JsonLdNode {
 	return {
 		'@type': 'ProfilePage',
@@ -115,6 +163,46 @@ export function profilePageNode(site: URL, canonicalURL: URL, title: string): Js
 		name: title,
 		isPartOf: { '@id': siteId(site) },
 		mainEntity: { '@id': personId(site) },
+		inLanguage: 'es',
+	};
+}
+
+export interface ResumeJsonLdParams {
+	pdfURL?: string;
+}
+
+export function courseNode(site: URL): JsonLdNode {
+	return {
+		'@type': 'Course',
+		'@id': courseId(site),
+		name: CV_COURSE_NAME,
+		courseCode: 'MF0493_3',
+		inLanguage: 'es',
+	};
+}
+
+export function resumeNode(
+	site: URL,
+	canonicalURL: URL,
+	{ pdfURL }: ResumeJsonLdParams = {},
+): JsonLdNode {
+	return {
+		'@type': 'Resume',
+		'@id': `${canonicalURL.href}#resume`,
+		url: canonicalURL.href,
+		name: `Currículum de ${AUTHOR}`,
+		principal: { '@id': personId(site) },
+		mainEntity: { '@id': personId(site) },
+		education: [{ '@id': courseId(site) }],
+		...(pdfURL
+			? {
+					distribution: {
+						'@type': 'DataDownload',
+						contentUrl: pdfURL,
+						encodingFormat: 'application/pdf',
+					},
+				}
+			: {}),
 		inLanguage: 'es',
 	};
 }

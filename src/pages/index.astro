@@ -1,10 +1,15 @@
 ---
+import Carousel from '../components/Carousel.astro';
 import PostList from '../components/PostList.astro';
 import { BASE_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { postToCarouselItem, projectToCarouselItem } from '../utils/carousel';
 import { getSortedPosts } from '../utils/posts';
+import { getSortedProjects } from '../utils/portfolio';
 
-const posts = (await getSortedPosts()).slice(0, 3);
+const allPosts = await getSortedPosts();
+const posts = allPosts.slice(0, 3);
+const projects = await getSortedProjects();
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
@@ -29,6 +34,16 @@ const posts = (await getSortedPosts()).slice(0, 3);
 	<h2>Últimos artículos</h2>
 	<PostList {posts} />
 	<p><a href={`${BASE_URL}blog/`}>Ver todos los artículos →</a></p>
+
+	<Carousel
+		projects={projects.map(projectToCarouselItem)}
+		posts={allPosts.map(postToCarouselItem)}
+	/>
+
+	<p>
+		¿Buscas ejemplos de mi trabajo? Echa un vistazo al
+		<a href={`${BASE_URL}portfolio/`}>portafolio</a>.
+	</p>
 
 	<p>¡Gracias por pasar por aquí!</p>
 </BaseLayout>

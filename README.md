@@ -6,7 +6,10 @@ Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](h
 
 - Artículos en Markdown y MDX, con esquema validado en `src/content.config.ts`.
 - Etiquetas (páginas en `/blog/tag/`), tiempo de lectura, extractos, tabla de contenidos y navegación entre artículos.
-- Los artículos con `draft: true` solo se ven en el servidor de desarrollo.
+- Portafolio de proyectos en `/portfolio/`, con ficha individual por proyecto y datos como rol, repositorio, URL pública y dos fechas.
+- Currículum en `/cv/`, con el PDF para descargar y un código QR que apunta directamente al archivo.
+- Carrusel en el inicio con pestañas Proyectos/Artículos, separadores por mes y animación «órbita de fechas».
+- Los artículos y proyectos con `draft: true` solo se ven en el servidor de desarrollo; las fichas de ejemplo del portafolio son borradores.
 - Feed RSS, sitemap, robots.txt, datos estructurados y fuentes locales.
 - Despliegue automático en GitHub Pages; el flujo ejecuta `astro check` antes de compilar.
 
@@ -15,13 +18,14 @@ Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](h
 ```text
 src/
 ├── assets/       # imágenes y fuentes que optimiza Astro
-├── components/   # BaseHead, Header, PostCard, PostList, Tags, etc.
-├── content/blog/ # artículos del blog (.md y .mdx)
-├── layouts/      # BaseLayout, BlogPost y PageLayout
-├── pages/        # rutas del sitio, tag/[tag] y 404
-├── styles/       # estilos globales
-└── utils/        # ordenación, lectura y etiquetas de artículos
-public/           # favicon y otros archivos estáticos
+├── components/       # BaseHead, Header, PostCard, ProjectCard, Carousel, etc.
+├── content/blog/     # artículos del blog (.md y .mdx)
+├── content/portfolio/# fichas de proyectos (.md y .mdx)
+├── layouts/          # BaseLayout, BlogPost y PageLayout
+├── pages/            # rutas del sitio, blog, portfolio, cv y 404
+├── styles/           # estilos globales
+└── utils/            # artículos, proyectos, carrusel y JSON-LD
+public/           # favicon, PDF del currículum y otros archivos estáticos
 .github/workflows # flujo de despliegue
 ```
 
@@ -50,6 +54,12 @@ Las cabeceras de los artículos son fotografías de la NASA, de dominio público
 | `blog-placeholder-3.jpg`   | `PIA03096` (Montañas de la Creación)      |
 | `blog-placeholder-4.jpg`   | `KSC-00pp1804` (lanzamiento nocturno)     |
 | `blog-placeholder-5.jpg`   | `as11-40-5948` (Apollo 11 en la Luna)     |
+
+## Currículum
+
+El PDF se llama `Curriculum Informatica VITAE 2026.pdf` y vive en `public/`. Si quieres sustituirlo, mantén ese nombre exacto: la página `/cv/` comprueba en tiempo de compilación que el archivo existe y solo muestra el botón y el QR cuando está presente.
+
+El código QR se genera durante el build con la dependencia `qrcode` y codifica la URL pública absoluta del PDF (con los espacios convertidos en `%20`), así que no depende de servicios externos ni de `localhost`.
 
 ## Despliegue en GitHub Pages
 

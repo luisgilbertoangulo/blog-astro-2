@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import SkipLink from '../components/SkipLink.astro';
-import type { BreadcrumbItem } from '../utils/jsonld';
+import type { BreadcrumbItem, ProjectJsonLdParams, ResumeJsonLdParams } from '../utils/jsonld';
 
 interface Props {
 	title: string;
@@ -12,7 +12,7 @@ interface Props {
 	mainClass?: string;
 	noindex?: boolean;
 	type?: 'website' | 'article';
-	image?: ImageMetadata;
+	image?: ImageMetadata | string;
 	imageAlt?: string;
 	publishedTime?: Date;
 	modifiedTime?: Date;
@@ -20,6 +20,8 @@ interface Props {
 	minutes?: number;
 	breadcrumbs?: BreadcrumbItem[];
 	profile?: boolean;
+	project?: ProjectJsonLdParams;
+	resume?: ResumeJsonLdParams;
 }
 
 const {
@@ -36,6 +38,8 @@ const {
 	minutes,
 	breadcrumbs,
 	profile,
+	project,
+	resume,
 } = Astro.props;
 ---
 
@@ -55,6 +59,8 @@ const {
 			{minutes}
 			{breadcrumbs}
 			{profile}
+			{project}
+			{resume}
 		/>
 	</head>
 	<body>

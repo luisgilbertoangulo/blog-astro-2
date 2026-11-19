@@ -23,4 +23,32 @@ const blog = defineCollection({
 		}),
 });
 
-export const collections = { blog };
+// Proyectos del portafolio. Las fotos son URLs externas, no archivos locales.
+const portfolio = defineCollection({
+	loader: glob({ base: './src/content/portfolio', pattern: '**/*.{md,mdx}' }),
+	schema: z
+		.object({
+			title: z.string(),
+			description: z.string(),
+			// Fecha en que se redactó la ficha.
+			writtenDate: z.coerce.date(),
+			// Fecha en que se realizó el proyecto.
+			completedDate: z.coerce.date(),
+			url: z.url().optional(),
+			repo: z.url().optional(),
+			role: z.string().optional(),
+			image: z.url().optional(),
+			imageAlt: z.string().default(''),
+			imageWidth: z.number().int().positive().optional(),
+			imageHeight: z.number().int().positive().optional(),
+			tags: z.array(z.string()).default([]),
+			featured: z.boolean().default(false),
+			draft: z.boolean().default(false),
+		})
+		.refine((data) => !data.image || data.imageAlt.trim().length > 0, {
+			message: 'imageAlt es obligatoria cuando se indica una imagen',
+			path: ['imageAlt'],
+		}),
+});
+
+export const collections = { blog, portfolio };

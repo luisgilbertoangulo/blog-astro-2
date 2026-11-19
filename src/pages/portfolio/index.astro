@@ -1,0 +1,31 @@
+---
+import ProjectList from '../../components/ProjectList.astro';
+import { BASE_URL } from '../../consts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { BreadcrumbItem } from '../../utils/jsonld';
+import { getSortedProjects } from '../../utils/portfolio';
+
+const projects = await getSortedProjects();
+const breadcrumbs: BreadcrumbItem[] = [
+	{ name: 'Inicio', url: BASE_URL },
+	{ name: 'Portafolio' },
+];
+---
+
+<BaseLayout
+	title="Portafolio"
+	description="Proyectos que he realizado: aplicaciones, sitios web y herramientas, con enlaces al código y a la versión publicada."
+	mainClass="wide"
+	{breadcrumbs}
+>
+	<h1>Portafolio</h1>
+	<p>
+		Una selección de los proyectos en los que he trabajado. Cada ficha incluye qué hice, cuándo
+		se realizó y, cuando está disponible, el enlace al código o a la aplicación.
+	</p>
+	{projects.length > 0 ? (
+		<ProjectList {projects} />
+	) : (
+		<p>No hay proyectos publicados todavía.</p>
+	)}
+</BaseLayout>

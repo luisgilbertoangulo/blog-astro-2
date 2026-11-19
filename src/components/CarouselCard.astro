@@ -1,0 +1,127 @@
+---
+import { Image } from 'astro:assets';
+import type { CarouselItem } from '../utils/carousel';
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+
+interface Props {
+	item: CarouselItem;
+}
+
+const { item } = Astro.props;
+---
+
+<article class="carousel-card">
+	<div class="card-image">
+		{item.image ? (
+			<Image
+				src={item.image}
+				alt={item.imageAlt}
+				width={640}
+				height={320}
+				layout="constrained"
+				widths={[320, 480, 640]}
+			/>
+		) : item.imageUrl ? (
+			<img src={item.imageUrl} alt={item.imageAlt} loading="lazy" decoding="async" />
+		) : (
+			<div class="image-placeholder" aria-hidden="true"></div>
+		)}
+	</div>
+	<div class="card-body">
+		<p class="meta">
+			<span class="badge">{item.kind === 'project' ? 'Proyecto' : 'Artículo'}</span>
+			<FormattedDate date={item.date} />
+		</p>
+		<h3 class="title"><a href={item.url}>{item.title}</a></h3>
+		{item.role && <p class="role">{item.role}</p>}
+		<p class="excerpt">{item.description}</p>
+		<div class="tags-wrap"><Tags tags={item.tags} /></div>
+	</div>
+</article>
+
+<style>
+	.carousel-card {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		width: 100%;
+		background: rgba(15, 23, 42, 0.72);
+		border: 1px solid var(--border);
+		border-radius: 18px;
+	}
+	.card-image {
+		overflow: hidden;
+		background: #020617;
+	}
+	.card-image :global(img),
+	.image-placeholder {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2 / 1;
+		height: auto;
+		object-fit: cover;
+		border-radius: 0;
+	}
+	.image-placeholder {
+		background:
+			radial-gradient(circle at 25% 30%, rgba(96, 165, 250, 0.45), transparent 55%),
+			linear-gradient(135deg, #0b1220, #1e3a8a);
+	}
+	.card-body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1.25rem;
+	}
+	.meta {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+	}
+	.badge {
+		padding: 0.1em 0.6em;
+		border: 1px solid rgba(96, 165, 250, 0.4);
+		border-radius: 999px;
+		color: var(--accent-dark);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		font-size: 0.7rem;
+	}
+	.title {
+		margin: 0;
+		font-size: 1.35rem;
+		line-height: 1.25;
+	}
+	.title a {
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+	.title a:hover {
+		color: var(--accent);
+	}
+	.role {
+		margin: 0;
+		color: var(--accent-dark);
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+	.excerpt {
+		display: -webkit-box;
+		overflow: hidden;
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95em;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+	}
+	.tags-wrap {
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+</style>

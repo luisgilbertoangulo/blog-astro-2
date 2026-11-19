@@ -5,6 +5,10 @@ export const SITE_DESCRIPTION = 'Apuntes de desarrollo web: HTML, CSS, JavaScrip
 export const AUTHOR = 'Luis Gilberto Angulo';
 export const AUTHOR_URL = 'https://github.com/luisgilbertoangulo';
 
+// Nombre exacto del PDF del currículum dentro de `public/`.
+export const CV_PDF_FILE = 'Curriculum Informatica VITAE 2026.pdf';
+export const CV_COURSE_NAME = 'MF0493_3 Implantación de aplicaciones web';
+
 // Astro normaliza este valor con barra final: '/blog-astro-2/' en producción,
 // '/' cuando no hay base configurada. Se usa para prefijar los enlaces internos.
 export const BASE_URL = import.meta.env.BASE_URL.endsWith('/')

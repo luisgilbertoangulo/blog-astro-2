@@ -1,0 +1,179 @@
+---
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import QRCode from 'qrcode';
+import { AUTHOR, AUTHOR_URL, BASE_URL, CV_COURSE_NAME, CV_PDF_FILE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { BreadcrumbItem } from '../utils/jsonld';
+
+// El PDF se sirve desde `public/`; si todavía no está, mostramos un aviso en vez de un enlace roto.
+const pdfPath = resolve(process.cwd(), 'public', CV_PDF_FILE);
+const hasPDF = existsSync(pdfPath);
+
+// La URL pública es absoluta y apunta al archivo con los espacios codificados (%20).
+const site = Astro.site ?? new URL(Astro.url.origin);
+const pdfURL = new URL(`${BASE_URL}${encodeURIComponent(CV_PDF_FILE)}`, site).href;
+const qrSvg = hasPDF
+	? await QRCode.toString(pdfURL, {
+			type: 'svg',
+			errorCorrectionLevel: 'M',
+			margin: 1,
+			width: 220,
+			color: { dark: '#0b1220ff', light: '#ffffffff' },
+		})
+	: '';
+
+const breadcrumbs: BreadcrumbItem[] = [
+	{ name: 'Inicio', url: BASE_URL },
+	{ name: 'Currículum' },
+];
+---
+
+<BaseLayout
+	title="Currículum"
+	description="Currículum de Luis Gilberto Angulo: formación en implantación de aplicaciones web. Descarga el PDF o escannea el código QR."
+	{breadcrumbs}
+	resume={{ pdfURL: hasPDF ? pdfURL : undefined }}
+>
+	<h1>Currículum</h1>
+	<p>
+		Aquí tienes mi currículum en PDF. También puedes escanear el código QR con el móvil para
+		abrir el mismo archivo directamente.
+	</p>
+
+	{
+		hasPDF ? (
+			<section class="download" aria-labelledby="download-title">
+				<h2 id="download-title">Descargar o escanear</h2>
+				<div class="download-grid">
+					<div class="download-action">
+						<p>Descarga una copia para tenerla siempre a mano.</p>
+						<a class="button" href={pdfURL} download={CV_PDF_FILE}>
+							Descargar PDF ↓
+						</a>
+						<p class="hint">
+							Archivo: <code>{CV_PDF_FILE}</code>
+						</p>
+					</div>
+					<div class="qr-block">
+						<div
+							class="qr"
+							role="img"
+							aria-label={`Código QR con el enlace al PDF del currículum: ${pdfURL}`}
+							set:html={qrSvg}
+						/>
+						<p class="qr-caption">Escanea para abrir el PDF</p>
+					</div>
+				</div>
+			</section>
+		) : (
+			<p class="notice" role="status">
+				Todavía no hay PDF disponible. Añade <code>{CV_PDF_FILE}</code> en la carpeta
+				<code>public/</code> para publicar la descarga y el código QR.
+			</p>
+		)
+	}
+
+	<section aria-labelledby="formacion-title">
+		<h2 id="formacion-title">Formación</h2>
+		<ul class="formation">
+			<li>
+				<strong>{CV_COURSE_NAME}</strong>
+			</li>
+		</ul>
+	</section>
+
+	<section aria-labelledby="contacto-title">
+		<h2 id="contacto-title">Contacto</h2>
+		<p>
+			{AUTHOR} ·
+			<a href={AUTHOR_URL} target="_blank" rel="noopener noreferrer">GitHub ↗</a> ·
+			<a href={`${BASE_URL}portfolio/`}>Portafolio</a>
+		</p>
+	</section>
+</BaseLayout>
+
+<style>
+	.download {
+		margin: 1.5rem 0 2rem;
+		padding: 1.5rem;
+		background: rgba(15, 23, 42, 0.6);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+	}
+	.download h2 {
+		margin-top: 0;
+	}
+	.download-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 2rem;
+	}
+	.download-action p {
+		margin: 0 0 1rem;
+	}
+	.button {
+		display: inline-block;
+		padding: 0.6em 1.3em;
+		border-radius: 999px;
+		background: var(--accent);
+		color: #0b1220;
+		font-weight: 700;
+		text-decoration: none;
+	}
+	.button:hover {
+		filter: brightness(1.1);
+	}
+	.hint {
+		margin-top: 1rem !important;
+		color: rgb(var(--gray));
+		font-size: 0.85em;
+		overflow-wrap: anywhere;
+	}
+	.qr-block {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.qr {
+		width: 150px;
+		padding: 0.6rem;
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	}
+	.qr :global(svg) {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.qr-caption {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.8rem;
+		text-align: center;
+	}
+	.notice {
+		padding: 1rem 1.25rem;
+		border: 1px dashed var(--border);
+		border-radius: 14px;
+		color: rgb(var(--gray));
+	}
+	.formation {
+		padding-left: 1.2rem;
+	}
+	.formation li {
+		margin-bottom: 0.5rem;
+	}
+	section h2 {
+		font-size: 1.4rem;
+	}
+	@media (max-width: 620px) {
+		.download-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+	}
+</style>
