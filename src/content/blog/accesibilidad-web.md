@@ -4,6 +4,7 @@ description: "Buenas prácticas sencillas para que tus páginas sean utilizables
 pubDate: "2026-08-30"
 heroImage: "../../assets/blog-placeholder-1.jpg"
 alt: "Paisaje de montañas azules con el sol y colinas verdes"
+tags: ["accesibilidad"]
 ---
 
 La accesibilidad no es una funcionalidad opcional que se añade al final. Son decisiones pequeñas tomadas desde el principio que mejoran la experiencia de todas las personas.

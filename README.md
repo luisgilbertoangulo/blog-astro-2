@@ -5,19 +5,22 @@ Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](h
 ## Qué contiene
 
 - Artículos en Markdown y MDX, con esquema validado en `src/content.config.ts`.
-- Feed RSS, sitemap, metadatos Open Graph y fuentes locales.
-- Despliegue automático en GitHub Pages mediante GitHub Actions.
+- Etiquetas (páginas en `/blog/tag/`), tiempo de lectura, extractos, tabla de contenidos y navegación entre artículos.
+- Los artículos con `draft: true` solo se ven en el servidor de desarrollo.
+- Feed RSS, sitemap, robots.txt, datos estructurados y fuentes locales.
+- Despliegue automático en GitHub Pages; el flujo ejecuta `astro check` antes de compilar.
 
 ## Estructura del proyecto
 
 ```text
 src/
 ├── assets/       # imágenes y fuentes que optimiza Astro
-├── components/   # BaseHead, Header, HeaderLink, Footer, FormattedDate
+├── components/   # BaseHead, Header, PostCard, PostList, Tags, etc.
 ├── content/blog/ # artículos del blog (.md y .mdx)
-├── layouts/      # BlogPost y PageLayout
-├── pages/        # rutas del sitio
-└── styles/       # estilos globales
+├── layouts/      # BaseLayout, BlogPost y PageLayout
+├── pages/        # rutas del sitio, tag/[tag] y 404
+├── styles/       # estilos globales
+└── utils/        # ordenación, lectura y etiquetas de artículos
 public/           # favicon y otros archivos estáticos
 .github/workflows # flujo de despliegue
 ```

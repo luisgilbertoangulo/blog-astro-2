@@ -4,6 +4,7 @@ description: "let y const, funciones flecha, destructuración y async/await con 
 pubDate: "2026-10-05"
 heroImage: "../../assets/blog-placeholder-4.jpg"
 alt: "Paisaje verde con colinas, árboles y nubes"
+tags: ["javascript"]
 ---
 
 JavaScript ha cambiado mucho desde los tiempos de `var` y callbacks anidados. Hoy contamos con una sintaxis más clara que conviene conocer aunque no uses frameworks.

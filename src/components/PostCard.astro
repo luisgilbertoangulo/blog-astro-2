@@ -1,0 +1,186 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { BASE_URL } from '../consts';
+import { readingMinutes } from '../utils/posts';
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+	featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const { title, description, pubDate, heroImage, alt, tags } = post.data;
+const minutes = readingMinutes(post);
+---
+
+<li class:list={['post-card', { featured }]}>
+	<article class="card-inner">
+		{heroImage && (
+			<div class="card-image">
+				<Image
+					width={featured ? 960 : 640}
+					height={featured ? 480 : 320}
+					layout="constrained"
+					widths={featured ? [480, 720, 960] : [320, 480, 640]}
+					src={heroImage}
+					alt={alt ?? ''}
+				/>
+			</div>
+		)}
+		<div class="card-body">
+			<p class="meta">
+				<FormattedDate date={pubDate} /> <span aria-hidden="true">·</span> {minutes} min de lectura
+			</p>
+			<h2 class="title">
+				<a class="stretched-link" href={`${BASE_URL}blog/${post.id}/`}>{title}</a>
+			</h2>
+			<p class="excerpt">{description}</p>
+			<div class="tags-wrap"><Tags {tags} linked /></div>
+		</div>
+	</article>
+</li>
+
+<style>
+	.post-card {
+		display: flex;
+		min-width: 0;
+	}
+	.card-inner {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		overflow: hidden;
+		background: rgba(15, 23, 42, 0.6);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease,
+			border-color 0.2s ease;
+	}
+	.post-card:hover .card-inner {
+		transform: translateY(-3px);
+		box-shadow: var(--box-shadow);
+		border-color: rgba(96, 165, 250, 0.5);
+	}
+	.card-image {
+		overflow: hidden;
+		background: #020617;
+	}
+	.card-image img {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2 / 1;
+		height: auto;
+		object-fit: cover;
+		border-radius: 0;
+		transition: transform 0.35s ease;
+	}
+	.post-card:hover .card-image img {
+		transform: scale(1.03);
+	}
+	.card-body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1.25rem;
+	}
+	.meta {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+	}
+	.title {
+		margin: 0;
+		font-size: 1.35rem;
+		line-height: 1.25;
+	}
+	.title a {
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+	.title a::after {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border-radius: inherit;
+		content: '';
+	}
+	.title a:hover {
+		color: var(--accent);
+	}
+	.title a:focus-visible {
+		outline: none;
+	}
+	.title a:focus-visible::after {
+		outline: 3px solid var(--accent);
+		outline-offset: -3px;
+	}
+	.excerpt {
+		display: -webkit-box;
+		overflow: hidden;
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95em;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+	.tags-wrap {
+		position: relative;
+		z-index: 2;
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+	.featured {
+		grid-column: 1 / -1;
+	}
+	.featured .card-inner {
+		display: grid;
+		grid-template-columns: 1.15fr 1fr;
+	}
+	.featured .card-image {
+		height: 100%;
+		min-height: 320px;
+	}
+	.featured .card-image img {
+		height: 100%;
+		aspect-ratio: auto;
+	}
+	.featured .card-body {
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 2rem;
+	}
+	.featured .title {
+		font-size: 2rem;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.post-card:hover .card-inner,
+		.post-card:hover .card-image img {
+			transform: none;
+		}
+	}
+	@media (max-width: 720px) {
+		.featured .card-inner {
+			display: flex;
+		}
+		.featured .card-image {
+			min-height: 0;
+		}
+		.featured .card-image img {
+			height: auto;
+			aspect-ratio: 2 / 1;
+		}
+		.featured .card-body {
+			padding: 1.25rem;
+		}
+		.featured .title {
+			font-size: 1.5rem;
+		}
+	}
+</style>

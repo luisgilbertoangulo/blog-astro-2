@@ -4,6 +4,7 @@ description: "Comandos esenciales de Git y cómo subir un proyecto a GitHub desd
 pubDate: "2026-09-18"
 heroImage: "../../assets/blog-placeholder-2.jpg"
 alt: "Paisaje de colinas cálidas al atardecer"
+tags: ["git"]
 ---
 
 Git guarda la historia de tu proyecto; GitHub es un lugar donde alojar esa historia y colaborar. Son cosas distintas, aunque se usen juntas.

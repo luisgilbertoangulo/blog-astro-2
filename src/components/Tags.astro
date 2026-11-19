@@ -1,0 +1,68 @@
+---
+import { tagPath } from '../utils/posts';
+
+interface Props {
+	tags: string[];
+	linked?: boolean;
+	active?: string;
+}
+
+const { tags, linked = false, active } = Astro.props;
+---
+
+{tags.length > 0 && (
+	<ul class="tags" aria-label="Etiquetas">
+		{tags.map((tag) => (
+			<li>
+				{linked ? (
+					<a
+						href={tagPath(tag)}
+						class:list={{ active: tag === active }}
+						aria-current={tag === active ? 'page' : undefined}
+					>
+						{tag}
+					</a>
+				) : (
+					<span class:list={{ active: tag === active }}>{tag}</span>
+				)}
+			</li>
+		))}
+	</ul>
+)}
+
+<style>
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.tags a,
+	.tags span {
+		display: inline-block;
+		padding: 0.15em 0.65em;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: rgba(96, 165, 250, 0.08);
+		color: var(--accent);
+		font-size: 0.8rem;
+		line-height: 1.5;
+		text-decoration: none;
+		text-transform: capitalize;
+		transition:
+			background-color 0.2s ease,
+			color 0.2s ease;
+	}
+	.tags a:hover,
+	.tags a:focus-visible {
+		background: var(--accent);
+		color: #0b1220;
+	}
+	.tags .active {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #0b1220;
+	}
+</style>

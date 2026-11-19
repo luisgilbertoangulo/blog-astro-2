@@ -16,6 +16,10 @@ const blog = defineCollection({
 			heroImage: z.optional(image()),
 			// Texto alternativo de la imagen de cabecera.
 			alt: z.string().optional(),
+			// Etiquetas en minúsculas, válidas también como segmentos de URL.
+			tags: z.array(z.string()).default([]),
+			// Los borradores no se publican fuera del servidor de desarrollo.
+			draft: z.boolean().default(false),
 		}),
 });
 

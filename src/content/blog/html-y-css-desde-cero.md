@@ -4,6 +4,7 @@ description: "Las bases de la web: HTML semántico, modelo de caja y los primero
 pubDate: "2026-10-20"
 heroImage: "../../assets/blog-placeholder-3.jpg"
 alt: "Paisaje de costa con el mar, el sol y una zona verde"
+tags: ["html", "css"]
 ---
 
 Toda página web, por compleja que sea, se acaba convirtiendo en HTML y CSS. El HTML aporta la estructura y el significado; el CSS se encarga del aspecto. Tener claras estas dos capas es el mejor punto de partida.
