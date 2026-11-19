@@ -6,7 +6,7 @@ Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](h
 
 - Artículos en Markdown y MDX, con esquema validado en `src/content.config.ts`.
 - Etiquetas (páginas en `/blog/tag/`), tiempo de lectura, extractos, tabla de contenidos y navegación entre artículos.
-- Portafolio de proyectos en `/portfolio/`, con ficha individual por proyecto y datos como rol, repositorio, URL pública y dos fechas.
+- Portafolio en `/portfolio/`: lista los repositorios públicos de GitHub y permite completarlos con fichas propias; cada proyecto tiene su propia página.
 - Currículum en `/cv/`, con el PDF para descargar y un código QR que apunta directamente al archivo.
 - Carrusel en el inicio con pestañas Proyectos/Artículos, separadores por mes y animación «órbita de fechas».
 - Los artículos y proyectos con `draft: true` solo se ven en el servidor de desarrollo; las fichas de ejemplo del portafolio son borradores.
@@ -54,6 +54,14 @@ Las cabeceras de los artículos son fotografías de la NASA, de dominio público
 | `blog-placeholder-3.jpg`   | `PIA03096` (Montañas de la Creación)      |
 | `blog-placeholder-4.jpg`   | `KSC-00pp1804` (lanzamiento nocturno)     |
 | `blog-placeholder-5.jpg`   | `as11-40-5948` (Apollo 11 en la Luna)     |
+
+## Portafolio desde GitHub
+
+Durante la compilación, `src/utils/github.ts` consulta la API de GitHub y convierte los repositorios públicos en proyectos del portafolio: nombre, descripción, homepage, lenguaje, temas, estrellas y fechas de creación y última actualización. La imagen es la tarjeta automática que genera GitHub (`opengraph.githubassets.com`), no una captura real del proyecto.
+
+La lista se actualiza al redesplegar el sitio. En GitHub Actions se usa `GITHUB_TOKEN` (disponible automáticamente) para no depender del límite de peticiones anónimas; en local funciona sin token. Si la API falla, el build continúa y se muestra un aviso en la consola.
+
+Para añadir detalles a un repo, crea una ficha en `src/content/portfolio/` con el mismo nombre que el repositorio (por ejemplo, `web-contacto.md`) y `draft: false`. Sus campos sobrescriben los datos de GitHub y su texto Markdown aparece en la página del proyecto.
 
 ## Currículum
 

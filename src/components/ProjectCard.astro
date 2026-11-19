@@ -1,11 +1,10 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import { projectPath } from '../utils/portfolio';
+import { projectPath, type ProjectView } from '../utils/portfolio';
 import FormattedDate from './FormattedDate.astro';
 import Tags from './Tags.astro';
 
 interface Props {
-	project: CollectionEntry<'portfolio'>;
+	project: ProjectView;
 }
 
 const { project } = Astro.props;
@@ -22,8 +21,11 @@ const {
 	imageWidth,
 	imageHeight,
 	tags,
+	source,
+	stars,
 } = project.data;
 const href = projectPath(project);
+const fromGitHub = source === 'github';
 ---
 
 <li class="project-card">
@@ -42,14 +44,17 @@ const href = projectPath(project);
 		)}
 		<div class="card-body">
 			<p class="meta">
-				Realizado: <FormattedDate date={completedDate} />
+				{fromGitHub ? 'Creado: ' : 'Realizado: '}<FormattedDate date={writtenDate} />
 				<span aria-hidden="true"> · </span>
-				Ficha: <FormattedDate date={writtenDate} />
+				{fromGitHub ? 'Actualizado: ' : 'Ficha: '}<FormattedDate date={completedDate} />
 			</p>
-			<h2 class="title"><a href={href}>{title}</a></h2>
+			<h2 class="title">
+				<a href={href}>{title}</a>
+				{fromGitHub && <span class="badge">GitHub</span>}
+			</h2>
 			{role && <p class="role">{role}</p>}
 			<p class="excerpt">{description}</p>
-			{(url || repo) && (
+			{(url || repo || stars !== undefined) && (
 				<p class="links">
 					{url && (
 						<a href={url} target="_blank" rel="noopener noreferrer">
@@ -61,6 +66,7 @@ const href = projectPath(project);
 							Código ↗
 						</a>
 					)}
+					{stars !== undefined && <span class="stars">★ {stars}</span>}
 				</p>
 			)}
 			<div class="tags-wrap"><Tags {tags} /></div>
@@ -116,6 +122,10 @@ const href = projectPath(project);
 		font-size: 0.82rem;
 	}
 	.title {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 		margin: 0;
 		font-size: 1.35rem;
 		line-height: 1.25;
@@ -126,6 +136,16 @@ const href = projectPath(project);
 	}
 	.title a:hover {
 		color: var(--accent);
+	}
+	.badge {
+		padding: 0.1em 0.6em;
+		border: 1px solid rgba(96, 165, 250, 0.4);
+		border-radius: 999px;
+		color: var(--accent-dark);
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
 	}
 	.role {
 		margin: 0;
@@ -148,6 +168,9 @@ const href = projectPath(project);
 		gap: 1rem;
 		margin: 0;
 		font-size: 0.9rem;
+	}
+	.stars {
+		color: rgb(var(--gray));
 	}
 	.tags-wrap {
 		margin-top: auto;

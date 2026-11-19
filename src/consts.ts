@@ -4,6 +4,7 @@ export const SITE_TITLE = 'El blog de Luis';
 export const SITE_DESCRIPTION = 'Apuntes de desarrollo web: HTML, CSS, JavaScript, Astro y Git';
 export const AUTHOR = 'Luis Gilberto Angulo';
 export const AUTHOR_URL = 'https://github.com/luisgilbertoangulo';
+export const GITHUB_OWNER = 'luisgilbertoangulo';
 
 // Nombre exacto del PDF del currículum dentro de `public/`.
 export const CV_PDF_FILE = 'Curriculum Informatica VITAE 2026.pdf';

@@ -1,6 +1,7 @@
 import type { ImageMetadata } from 'astro';
 import { BASE_URL } from '../consts';
 import type { CollectionEntry } from 'astro:content';
+import type { ProjectView } from './portfolio';
 
 export interface CarouselItem {
 	kind: 'project' | 'post';
@@ -30,7 +31,7 @@ export function postToCarouselItem(post: CollectionEntry<'blog'>): CarouselItem 
 	};
 }
 
-export function projectToCarouselItem(project: CollectionEntry<'portfolio'>): CarouselItem {
+export function projectToCarouselItem(project: ProjectView): CarouselItem {
 	return {
 		kind: 'project',
 		title: project.data.title,

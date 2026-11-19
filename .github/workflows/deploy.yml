@@ -31,6 +31,8 @@ jobs:
         run: npm ci
       - name: Comprobar tipos y componentes
         run: npm run check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     needs: check
@@ -42,6 +44,8 @@ jobs:
         uses: withastro/action@v6
         with:
           node-version: 26
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: build

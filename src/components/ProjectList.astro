@@ -1,9 +1,9 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { ProjectView } from '../utils/portfolio';
 import ProjectCard from './ProjectCard.astro';
 
 interface Props {
-	projects: CollectionEntry<'portfolio'>[];
+	projects: ProjectView[];
 }
 
 const { projects } = Astro.props;
