@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { projects, posts } = Astro.props;
+const AUTOPLAY_MS = 6000;
 
 const panels = [
 	{
@@ -25,7 +26,12 @@ const panels = [
 ];
 ---
 
-<section class="carousel" data-carousel aria-labelledby="carousel-title">
+<section
+	class="carousel"
+	data-carousel
+	data-interval={AUTOPLAY_MS}
+	aria-labelledby="carousel-title"
+>
 	<div class="carousel-head">
 		<h2 id="carousel-title">Proyectos y artículos por fecha</h2>
 		<div class="tabs" role="tablist" aria-label="Tipo de contenido">
@@ -44,6 +50,15 @@ const panels = [
 				</button>
 			))}
 		</div>
+		<button
+			class="autoplay-toggle"
+			type="button"
+			data-autoplay
+			aria-label="Pausar avance automático"
+			aria-pressed="true"
+		>
+			⏸
+		</button>
 	</div>
 
 	{panels.map((panel) => (
@@ -111,6 +126,55 @@ const panels = [
 		root.classList.add('is-enhanced');
 		const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
 		const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+		const toggle = root.querySelector<HTMLButtonElement>('[data-autoplay]');
+		const interval = Number(root.dataset.interval) || 6000;
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		root.style.setProperty('--interval', `${interval}ms`);
+
+		let playing = !reducedMotion.matches;
+		let hovered = false;
+		let focused = false;
+		let pageHidden = document.hidden;
+		let timer: number | undefined;
+
+		interface Controller {
+			panel: HTMLElement;
+			advance: () => void;
+			steps: number;
+		}
+		const controllers: Controller[] = [];
+		const activeController = () => controllers.find((item) => !item.panel.hidden);
+
+		function isPaused() {
+			return !playing || hovered || focused || pageHidden;
+		}
+
+		function updateState() {
+			root.classList.toggle('is-paused', isPaused());
+			if (!toggle) return;
+			toggle.hidden = reducedMotion.matches;
+			toggle.textContent = playing ? '⏸' : '▶';
+			toggle.setAttribute(
+				'aria-label',
+				playing ? 'Pausar avance automático' : 'Reanudar avance automático',
+			);
+			toggle.setAttribute('aria-pressed', String(playing));
+		}
+
+		function stopTimer() {
+			if (timer !== undefined) {
+				window.clearTimeout(timer);
+				timer = undefined;
+			}
+		}
+
+		function schedule() {
+			stopTimer();
+			updateState();
+			const controller = activeController();
+			if (isPaused() || !controller || controller.steps < 2) return;
+			timer = window.setTimeout(() => controller.advance(), interval);
+		}
 
 		const showTab = (name: string, focus = false) => {
 			tabs.forEach((tab) => {
@@ -122,6 +186,7 @@ const panels = [
 			panels.forEach((panel) => {
 				panel.hidden = panel.dataset.panel !== name;
 			});
+			schedule();
 		};
 
 		tabs.forEach((tab, index) => {
@@ -163,13 +228,17 @@ const panels = [
 					if (i === index) dot.setAttribute('aria-current', 'true');
 					else dot.removeAttribute('aria-current');
 				});
-				segments.forEach((segment, i) => segment.classList.toggle('is-done', i <= index));
+				segments.forEach((segment, i) => {
+					segment.classList.toggle('is-done', i < index);
+					segment.classList.toggle('is-active', i === index);
+				});
 				if (live) live.textContent = `Diapositiva ${index + 1} de ${steps.length}`;
 			};
 
 			const go = (next: number) => {
 				index = (next + steps.length) % steps.length;
 				render();
+				schedule();
 			};
 
 			panel.querySelector('.prev')?.addEventListener('click', () => go(index - 1));
@@ -185,8 +254,41 @@ const panels = [
 					go(index + 1);
 				}
 			});
+
+			controllers.push({ panel, advance: () => go(index + 1), steps: steps.length });
 			render();
 		});
+
+		toggle?.addEventListener('click', () => {
+			playing = !playing;
+			schedule();
+		});
+		root.addEventListener('mouseenter', () => {
+			hovered = true;
+			schedule();
+		});
+		root.addEventListener('mouseleave', () => {
+			hovered = false;
+			schedule();
+		});
+		root.addEventListener('focusin', () => {
+			focused = true;
+			schedule();
+		});
+		root.addEventListener('focusout', (event) => {
+			if (root.contains(event.relatedTarget as Node | null)) return;
+			focused = false;
+			schedule();
+		});
+		document.addEventListener('visibilitychange', () => {
+			pageHidden = document.hidden;
+			schedule();
+		});
+		reducedMotion.addEventListener('change', () => {
+			playing = !reducedMotion.matches;
+			schedule();
+		});
+		schedule();
 	});
 </script>
 
@@ -237,7 +339,8 @@ const panels = [
 	}
 	.tab:focus-visible,
 	.nav:focus-visible,
-	.dot:focus-visible {
+	.dot:focus-visible,
+	.autoplay-toggle:focus-visible {
 		outline: 3px solid var(--accent-dark);
 		outline-offset: 2px;
 	}
@@ -307,6 +410,27 @@ const panels = [
 		color: #0b1220;
 		transform: scale(1.06);
 	}
+	.autoplay-toggle {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+		border: 1px solid var(--border);
+		border-radius: 50%;
+		background: rgba(15, 23, 42, 0.8);
+		color: var(--accent-dark);
+		font: inherit;
+		font-size: 0.85rem;
+		cursor: pointer;
+	}
+	.autoplay-toggle[hidden] {
+		display: none;
+	}
+	.autoplay-toggle:hover {
+		background: var(--accent);
+		color: #0b1220;
+	}
 	.dots {
 		display: flex;
 		align-items: center;
@@ -338,14 +462,33 @@ const panels = [
 		margin-top: 1rem;
 	}
 	.progress-segment {
+		position: relative;
 		flex: 1;
 		height: 2px;
+		overflow: hidden;
 		border-radius: 2px;
 		background: rgba(148, 163, 184, 0.2);
 		transition: background-color 0.4s ease;
 	}
 	.progress-segment.is-done {
 		background: var(--accent);
+	}
+	.progress-segment.is-active::after {
+		position: absolute;
+		inset: 0;
+		background: var(--accent);
+		content: '';
+		transform: scaleX(0);
+		transform-origin: left;
+		animation: carousel-fill var(--interval, 6000ms) linear forwards;
+	}
+	.is-paused .progress-segment.is-active::after {
+		animation-play-state: paused;
+	}
+	@keyframes carousel-fill {
+		to {
+			transform: scaleX(1);
+		}
 	}
 
 	/* Animación «órbita de fechas»: profundidad, parallax y estelas de progreso. */
@@ -390,6 +533,10 @@ const panels = [
 		}
 		.is-enhanced .date-marker {
 			transform: none;
+		}
+		.is-enhanced .progress-segment.is-active::after {
+			animation: none;
+			transform: scaleX(1);
 		}
 	}
 </style>

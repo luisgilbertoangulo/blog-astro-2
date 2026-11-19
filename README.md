@@ -8,7 +8,7 @@ Blog personal sobre desarrollo web, creado con la plantilla de blog de [Astro](h
 - Etiquetas (páginas en `/blog/tag/`), tiempo de lectura, extractos, tabla de contenidos y navegación entre artículos.
 - Portafolio en `/portfolio/`: lista los repositorios públicos de GitHub y permite completarlos con fichas propias; cada proyecto tiene su propia página.
 - Currículum en `/cv/`, con el PDF para descargar y un código QR que apunta directamente al archivo.
-- Carrusel en el inicio con pestañas Proyectos/Artículos, separadores por mes y animación «órbita de fechas».
+- Carrusel en el inicio con pestañas Proyectos/Artículos, separadores por mes, animación «órbita de fechas» y avance automático que se pausa al interactuar y respeta `prefers-reduced-motion`.
 - Los artículos y proyectos con `draft: true` solo se ven en el servidor de desarrollo; las fichas de ejemplo del portafolio son borradores.
 - Feed RSS, sitemap, robots.txt, datos estructurados y fuentes locales.
 - Despliegue automático en GitHub Pages; el flujo ejecuta `astro check` antes de compilar.
