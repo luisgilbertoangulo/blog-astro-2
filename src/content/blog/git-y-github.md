@@ -3,7 +3,7 @@ title: "Git y GitHub: el flujo básico"
 description: "Comandos esenciales de Git y cómo subir un proyecto a GitHub desde cero."
 pubDate: "2026-09-18"
 heroImage: "../../assets/blog-placeholder-2.jpg"
-alt: "Paisaje de colinas cálidas al atardecer"
+alt: "Horizonte terrestre y la Luna al fondo, vistos desde la Estación Espacial Internacional"
 tags: ["git"]
 ---
 

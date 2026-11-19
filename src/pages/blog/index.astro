@@ -1,15 +1,22 @@
 ---
 import PostList from '../../components/PostList.astro';
+import { BASE_URL } from '../../consts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { BreadcrumbItem } from '../../utils/jsonld';
 import { getSortedPosts } from '../../utils/posts';
 
 const posts = await getSortedPosts();
+const breadcrumbs: BreadcrumbItem[] = [
+	{ name: 'Inicio', url: BASE_URL },
+	{ name: 'Artículos' },
+];
 ---
 
 <BaseLayout
 	title="Artículos"
 	description="Apuntes sobre desarrollo web, ordenados del más reciente al más antiguo."
 	mainClass="wide"
+	{breadcrumbs}
 >
 	<h1>Artículos</h1>
 	<p>Apuntes sobre desarrollo web, ordenados del más reciente al más antiguo.</p>

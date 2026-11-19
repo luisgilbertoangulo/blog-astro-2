@@ -3,7 +3,7 @@ title: "HTML y CSS desde cero"
 description: "Las bases de la web: HTML semántico, modelo de caja y los primeros pasos con CSS."
 pubDate: "2026-10-20"
 heroImage: "../../assets/blog-placeholder-3.jpg"
-alt: "Paisaje de costa con el mar, el sol y una zona verde"
+alt: "Pilares de gas y polvo donde nacen estrellas, vistos por el telescopio Spitzer de la NASA"
 tags: ["html", "css"]
 ---
 

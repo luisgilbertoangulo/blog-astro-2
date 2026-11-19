@@ -3,7 +3,7 @@ title: "Accesibilidad web sin complicaciones"
 description: "Buenas prácticas sencillas para que tus páginas sean utilizables por todo el mundo."
 pubDate: "2026-08-30"
 heroImage: "../../assets/blog-placeholder-1.jpg"
-alt: "Paisaje de montañas azules con el sol y colinas verdes"
+alt: "Astronauta flotando sobre la Tierra durante un paseo espacial"
 tags: ["accesibilidad"]
 ---
 

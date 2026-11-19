@@ -3,7 +3,7 @@ title: "JavaScript moderno en la práctica"
 description: "let y const, funciones flecha, destructuración y async/await con ejemplos sencillos."
 pubDate: "2026-10-05"
 heroImage: "../../assets/blog-placeholder-4.jpg"
-alt: "Paisaje verde con colinas, árboles y nubes"
+alt: "Transbordador espacial despegando de noche"
 tags: ["javascript"]
 ---
 

@@ -6,6 +6,17 @@ import type { ImageMetadata } from 'astro';
 import FallbackImage from '../assets/blog-placeholder-1.jpg';
 import { AUTHOR, BASE_URL, SITE_TITLE } from '../consts';
 import { Font } from 'astro:assets';
+import {
+	blogPostingNode,
+	breadcrumbNode,
+	personNode,
+	profilePageNode,
+	serializeJsonLd,
+	webPageNode,
+	websiteNode,
+	type BreadcrumbItem,
+	type JsonLdNode,
+} from '../utils/jsonld';
 
 interface Props {
 	title: string;
@@ -16,6 +27,10 @@ interface Props {
 	type?: 'website' | 'article';
 	publishedTime?: Date;
 	modifiedTime?: Date;
+	tags?: string[];
+	minutes?: number;
+	breadcrumbs?: BreadcrumbItem[];
+	profile?: boolean;
 }
 
 const {
@@ -27,44 +42,48 @@ const {
 	type = 'website',
 	publishedTime,
 	modifiedTime,
+	tags = [],
+	minutes,
+	breadcrumbs,
+	profile = false,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const siteURL = new URL(BASE_URL, Astro.site);
+// Astro.site está configurado en astro.config.mjs; el fallback evita fallar en otros entornos.
+const site = Astro.site ?? new URL(Astro.url.origin);
+const canonicalURL = new URL(Astro.url.pathname, site);
+const siteURL = new URL(BASE_URL, site);
 const ogImageURL = new URL(image.src, Astro.url);
 
-const author = {
-	'@type': 'Person',
-	name: AUTHOR,
-	url: 'https://github.com/luisgilbertoangulo',
-};
+// Un único grafo conecta Person, WebSite y, según la página, el resto de entidades.
+const graph: JsonLdNode[] = [personNode(siteURL), websiteNode(siteURL)];
 
-// Datos estructurados: WebSite en páginas normales, BlogPosting en artículos.
-const structuredData =
-	type === 'article'
-		? {
-				'@context': 'https://schema.org',
-				'@type': 'BlogPosting',
-				headline: title,
-				description,
-				image: ogImageURL.href,
-				datePublished: publishedTime?.toISOString(),
-				dateModified: (modifiedTime ?? publishedTime)?.toISOString(),
-				author,
-				publisher: { '@type': 'Person', name: SITE_TITLE },
-				mainEntityOfPage: canonicalURL.href,
-				inLanguage: 'es',
-			}
-		: {
-				'@context': 'https://schema.org',
-				'@type': 'WebSite',
-				name: SITE_TITLE,
-				url: siteURL.href,
-				description,
-				publisher: author,
-				inLanguage: 'es',
-			};
-const jsonLd = JSON.stringify(structuredData).replace(/</g, '\\u003c');
+if (type === 'article') {
+	graph.push(
+		webPageNode({ site: siteURL, canonicalURL, title, description, imageURL: ogImageURL }),
+		blogPostingNode({
+			site: siteURL,
+			canonicalURL,
+			imageURL: ogImageURL,
+			title,
+			description,
+			publishedTime,
+			modifiedTime,
+			tags,
+			minutes,
+		}),
+		breadcrumbNode(canonicalURL, [
+			{ name: 'Inicio', url: BASE_URL },
+			{ name: 'Artículos', url: `${BASE_URL}blog/` },
+			{ name: title },
+		]),
+	);
+} else if (profile) {
+	graph.push(profilePageNode(siteURL, canonicalURL, title));
+} else if (breadcrumbs?.length) {
+	graph.push(breadcrumbNode(canonicalURL, breadcrumbs));
+}
+
+const jsonLd = serializeJsonLd(graph);
 ---
 
 <!-- Metadatos globales -->

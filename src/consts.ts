@@ -3,6 +3,7 @@
 export const SITE_TITLE = 'El blog de Luis';
 export const SITE_DESCRIPTION = 'Apuntes de desarrollo web: HTML, CSS, JavaScript, Astro y Git';
 export const AUTHOR = 'Luis Gilberto Angulo';
+export const AUTHOR_URL = 'https://github.com/luisgilbertoangulo';
 
 // Astro normaliza este valor con barra final: '/blog-astro-2/' en producción,
 // '/' cuando no hay base configurada. Se usa para prefijar los enlaces internos.

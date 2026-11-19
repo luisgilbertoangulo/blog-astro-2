@@ -1,20 +1,32 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import type { BreadcrumbItem } from '../utils/jsonld';
 
 interface Props {
 	title: string;
 	description: string;
 	mainClass?: string;
 	noindex?: boolean;
+	breadcrumbs?: BreadcrumbItem[];
+	profile?: boolean;
 }
 
-const { title, description, mainClass, noindex = false } = Astro.props;
+const {
+	title,
+	description,
+	mainClass,
+	noindex = false,
+	breadcrumbs,
+	profile,
+} = Astro.props;
 ---
 
 <BaseLayout
 	{title}
 	{description}
 	{noindex}
+	{breadcrumbs}
+	{profile}
 	mainClass={['prose', mainClass].filter(Boolean).join(' ')}
 >
 	<h1>{title}</h1>

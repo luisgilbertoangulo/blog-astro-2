@@ -39,6 +39,18 @@ Astro crea una ruta por cada archivo de `src/pages/`. Los artículos se leen des
 
 El proyecto sigue las instrucciones de `AGENTS.md`: el servidor de desarrollo se inicia con `astro dev --background` y se gestiona con `astro dev stop`, `astro dev status` y `astro dev logs`.
 
+## Imágenes
+
+Las cabeceras de los artículos son fotografías de la NASA, de dominio público (sin regalías), recortadas a 2:1 y guardadas en `src/assets/`:
+
+| Archivo                    | Imagen (ID de NASA)                       |
+| -------------------------- | ----------------------------------------- |
+| `blog-placeholder-1.jpg`   | `iss059e002710` (paseo espacial)          |
+| `blog-placeholder-2.jpg`   | `iss036e036601` (horizonte lunar)         |
+| `blog-placeholder-3.jpg`   | `PIA03096` (Montañas de la Creación)      |
+| `blog-placeholder-4.jpg`   | `KSC-00pp1804` (lanzamiento nocturno)     |
+| `blog-placeholder-5.jpg`   | `as11-40-5948` (Apollo 11 en la Luna)     |
+
 ## Despliegue en GitHub Pages
 
 El sitio se publica en <https://luisgilbertoangulo.github.io/blog-astro-2/>.

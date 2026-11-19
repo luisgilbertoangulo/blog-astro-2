@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import PostList from '../../../components/PostList.astro';
 import Tags from '../../../components/Tags.astro';
 import { BASE_URL } from '../../../consts';
+import type { BreadcrumbItem } from '../../../utils/jsonld';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getAllTags, getSortedPosts } from '../../../utils/posts';
 
@@ -26,12 +27,18 @@ interface Props {
 }
 
 const { tag, allTags, posts } = Astro.props;
+const breadcrumbs: BreadcrumbItem[] = [
+	{ name: 'Inicio', url: BASE_URL },
+	{ name: 'Artículos', url: `${BASE_URL}blog/` },
+	{ name: tag },
+];
 ---
 
 <BaseLayout
 	title={`Artículos sobre ${tag}`}
 	description={`Apuntes del blog etiquetados como ${tag}.`}
 	mainClass="wide prose"
+	{breadcrumbs}
 >
 	<header class="tag-header">
 		<p class="eyebrow">Explora por etiqueta</p>

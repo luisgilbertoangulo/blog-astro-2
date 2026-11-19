@@ -45,6 +45,8 @@ const toc = headings.filter((heading) => heading.depth === 2 || heading.depth ==
 	type="article"
 	publishedTime={pubDate}
 	modifiedTime={updatedDate}
+	{tags}
+	{minutes}
 >
 	{heroImage && (
 		<div class="hero-image">
